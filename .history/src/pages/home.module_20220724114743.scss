@@ -1,0 +1,11 @@
+.posts {
+  margin-top: 2rem;
+
+  > a {
+    display: block;
+  }
+
+  a + a {
+    margin-top: 3rem;
+  }
+}
