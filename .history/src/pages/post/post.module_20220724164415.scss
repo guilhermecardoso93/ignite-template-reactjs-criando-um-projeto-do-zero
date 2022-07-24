@@ -11,10 +11,7 @@
     margin: 3rem 0;
   }
 
-  p,
-  span,
-  a,
-  ul {
+  p, span, a, ul {
     font-size: 1.125rem;
     line-height: 1.8;
     margin: 1.8rem 0;
@@ -52,7 +49,6 @@
     margin: 0;
     list-style: none;
     display: flex;
-    align-items: center;
 
     & li {
       margin: 0;

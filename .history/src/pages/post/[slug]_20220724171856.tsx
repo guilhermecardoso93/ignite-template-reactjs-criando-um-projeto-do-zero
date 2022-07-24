@@ -9,7 +9,6 @@ import Head from 'next/head';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
-import { useRouter } from 'next/router';
 
 interface Post {
   first_publication_date: string | null;
@@ -32,36 +31,11 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
-  const formattedDate = format(
-    new Date(post.first_publication_date),
-    'dd MMM yyyy',
-    {
-      locale: ptBR,
-    }
-  );
-
-  const router = useRouter();
-  if (router.isFallback) {
-    return <h1>Carregando...</h1>;
-  }
-
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
-
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
-
-    return averageReadingPost;
-  };
+export default function Post({ post }: PostProps) {
   return (
     <>
       <Head>
-        <title>SpaceTraveling | {post.data.title}</title>
+        <title>SpaceTraveling | </title>
       </Head>
       <Header />
       <img src={post.data.banner.url} alt="imagem" className={styles.banner} />
@@ -72,16 +46,14 @@ export default function Post({ post }: PostProps): JSX.Element {
             <ul>
               <li>
                 <FiCalendar />
-                {formattedDate}
+                11 mar 2022
               </li>
               <li>
                 <FiUser />
                 {post.data.author}
               </li>
               <li>
-                <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
-                </time>
+                <FiClock />5 Minuetos
               </li>
             </ul>
           </div>

@@ -33,6 +33,32 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
+
+  const router = useRouter();
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
+
+  const totalPostPhrases = post.data.content.reduce((acc, item) => {
+    const heading = item.heading.trim().split(' ').length;
+    const body = item.body.reduce((accumulator, { text }) => {
+      return (accumulator += text.trim().split(' ').length);
+    }, 0);
+
+    return (acc += heading + body);
+  }, 0);
+
+  const minutesToReadThePost = Math.ceil(totalPostPhrases / 200);
+/*
+  const totalWords = post.data.content.reduce((total, contentItem) => {
+    const headingTime = contentItem.heading.match(/\s+/).length;
+    console.log(headingTime)
+    const wordsTime = RichText.asText(contentItem.body).split(/\s+/).length;
+
+    return total + headingTime + wordsTime;
+  }, 0);
+  const readTime = Math.ceil(totalWords / 200);*/
+
   const formattedDate = format(
     new Date(post.first_publication_date),
     'dd MMM yyyy',
@@ -41,23 +67,6 @@ export default function Post({ post }: PostProps): JSX.Element {
     }
   );
 
-  const router = useRouter();
-  if (router.isFallback) {
-    return <h1>Carregando...</h1>;
-  }
-
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
-
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
-
-    return averageReadingPost;
-  };
   return (
     <>
       <Head>
@@ -79,9 +88,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                 {post.data.author}
               </li>
               <li>
-                <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
-                </time>
+                <FiClock />{`${minutesToReadThePost}min`} 
               </li>
             </ul>
           </div>

@@ -46,18 +46,17 @@ export default function Post({ post }: PostProps): JSX.Element {
     return <h1>Carregando...</h1>;
   }
 
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
 
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
+  const totalWords = post.data.content.reduce((total, contentItem) => {
+    const headingTime = contentItem.heading.split('').length;
+    const wordsTime = RichText.asText(contentItem.body).split('').length;
 
-    return averageReadingPost;
-  };
+    return total + headingTime + wordsTime;
+  }, 0);
+  const readTime = Math.ceil(totalWords / 200);
+
+
+
   return (
     <>
       <Head>
@@ -80,7 +79,10 @@ export default function Post({ post }: PostProps): JSX.Element {
               </li>
               <li>
                 <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
+                  <span>
+                    <FiClock strokeWidth={2.5} size={20} />
+                  </span>
+                   min
                 </time>
               </li>
             </ul>

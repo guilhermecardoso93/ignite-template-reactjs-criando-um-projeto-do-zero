@@ -1,15 +1,16 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { getPrismicClient } from '../../services/prismic';
-import { RichText } from 'prismic-dom';
-import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import { useRouter } from 'next/router';
+
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Header } from '../../components/Header';
 import Head from 'next/head';
+import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import { RichText } from 'prismic-dom';
+import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
-import { useRouter } from 'next/router';
+import { Header } from '../../components/Header';
 
 interface Post {
   first_publication_date: string | null;
@@ -27,12 +28,24 @@ interface Post {
     }[];
   };
 }
-
 interface PostProps {
   post: Post;
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
+  const router = useRouter();
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
+
+  const totalWords = post.data.content.reduce((total, contentItem) => {
+    const headingTime = contentItem.heading.split(/\s+/).length;
+    const wordsTime = RichText.asText(contentItem.body).split(/\s+/).length;
+
+    return total + headingTime + wordsTime;
+  }, 0);
+  const readTime = Math.ceil(totalWords / 200);
+
   const formattedDate = format(
     new Date(post.first_publication_date),
     'dd MMM yyyy',
@@ -41,23 +54,6 @@ export default function Post({ post }: PostProps): JSX.Element {
     }
   );
 
-  const router = useRouter();
-  if (router.isFallback) {
-    return <h1>Carregando...</h1>;
-  }
-
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
-
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
-
-    return averageReadingPost;
-  };
   return (
     <>
       <Head>
@@ -79,9 +75,8 @@ export default function Post({ post }: PostProps): JSX.Element {
                 {post.data.author}
               </li>
               <li>
-                <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
-                </time>
+                <FiClock />
+                {`${readTime} min`}
               </li>
             </ul>
           </div>
@@ -92,6 +87,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                 <h2>{content.heading}</h2>
                 <div
                   className={styles.postContent}
+                  // eslint-disable-next-line react/no-danger
                   dangerouslySetInnerHTML={{
                     __html: RichText.asHtml(content.body),
                   }}
@@ -107,7 +103,7 @@ export default function Post({ post }: PostProps): JSX.Element {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient({});
-  const posts = await prismic.getByType('post');
+  const posts = await prismic.getByType('posts');
 
   const paths = posts.results.map(post => {
     return {
@@ -125,8 +121,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { slug } = params;
+
   const prismic = getPrismicClient({});
-  const response = await prismic.getByUID('post', String(slug));
+  const response = await prismic.getByUID('posts', String(slug));
 
   const post = {
     uid: response.uid,

@@ -33,6 +33,9 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
+
+
+
   const formattedDate = format(
     new Date(post.first_publication_date),
     'dd MMM yyyy',
@@ -40,24 +43,11 @@ export default function Post({ post }: PostProps): JSX.Element {
       locale: ptBR,
     }
   );
-
   const router = useRouter();
   if (router.isFallback) {
     return <h1>Carregando...</h1>;
   }
 
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
-
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
-
-    return averageReadingPost;
-  };
   return (
     <>
       <Head>
@@ -79,9 +69,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                 {post.data.author}
               </li>
               <li>
-                <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
-                </time>
+                <FiClock />{} 
               </li>
             </ul>
           </div>

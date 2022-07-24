@@ -80,7 +80,7 @@ export default function Post({ post }: PostProps): JSX.Element {
               </li>
               <li>
                 <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
+                  <FiClock /> {`${calculateAverageReadingTime()}`min}
                 </time>
               </li>
             </ul>

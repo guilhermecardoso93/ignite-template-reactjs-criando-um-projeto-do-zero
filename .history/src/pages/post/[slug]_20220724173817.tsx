@@ -33,31 +33,31 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
-  const formattedDate = format(
+ 
+  const totalWords = post.data.content.reduce((total, contentItem)=> {
+    total += contentItem.heading.slice.length;
+  
+    const words = contentItem.body.map(item => item.text.split(' ').length);
+  
+    words.map(word => (total += word));
+  
+    return total
+   }, 0)
+  
+   const readTime = Math.ceil(totalWords / 200);
+  
+   const router = useRouter();
+  
+   if(router.isFallback){
+    return <h1>Carregando...</h1>
+   }
+  
+   const formattedDate = format(
     new Date(post.first_publication_date),
-    'dd MMM yyyy',
-    {
-      locale: ptBR,
-    }
-  );
+    "dd MMM yyyy",
+    {locale: ptBR}
+   )
 
-  const router = useRouter();
-  if (router.isFallback) {
-    return <h1>Carregando...</h1>;
-  }
-
-  const calculateAverageReadingTime = () => {
-    const wordsArray = post.data.content
-      .map(content => RichText.asText(content.body))
-      .join(' ');
-
-    const averageWordsReadPerMinute = 200;
-    const averageReadingPost = Math.ceil(
-      wordsArray.length / averageWordsReadPerMinute
-    );
-
-    return averageReadingPost;
-  };
   return (
     <>
       <Head>
@@ -79,9 +79,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                 {post.data.author}
               </li>
               <li>
-                <time>
-                  <FiClock /> {`${calculateAverageReadingTime()}min`}
-                </time>
+                <FiClock />{readTime}
               </li>
             </ul>
           </div>
