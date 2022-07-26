@@ -30,7 +30,6 @@ interface Post {
 
 interface PostProps {
   post: Post;
-  preview: boolean;
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
@@ -151,7 +150,6 @@ export const getStaticProps: GetStaticProps = async ({ params, preview = false, 
   return {
     props: {
       post,
-      preview
     },
     revalidate: 1800,
   };
